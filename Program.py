@@ -1,20 +1,20 @@
 import tkinter as tk
 
+
 class QA:
-    def __init__(self,avg,evalsdone):
-        self.Evalsdone= evalsdone
+    def __init__(self, avg, evalsdone):
+        self.Evalsdone = evalsdone
         self.AVG = avg
 
     def CalcAvg(self):
-
         return self.AVG
-    def CalcTotscore(self):
 
+    def CalcTotscore(self):
         return self.TotScore
 
 
 class TM:
-    def __init__(self, racfid, email, boss, evaluator, qa,name):
+    def __init__(self, racfid, email, boss, evaluator, qa, name):
         self.name = name
         self.RACFID = racfid
         self.Email = email
@@ -31,12 +31,13 @@ class TM:
                     nombre VARCHAR(50) NOT NULL,
                     Email  VARCHAR(50) NOT NULL,
                     Boss VARCHAR(12) NOT NULL,
-                      
+
                     promedio REAL
                 );
             """)
             conn.commit()
             return conn
+
     def ShowInfo(self):
         print(f"RACFID: {self.RACFID}")
         print(f"Email: {self.Email}")
@@ -51,10 +52,43 @@ class Sups(TM):
         self.Team = team
 
 
+def _conn():
+    conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row
+    conn.execute("""
+                CREATE TABLE IF NOT EXISTS Staff (
+                    RACFID VARCHAR(12) PRIMARY KEY,
+                    nombre VARCHAR(50) NOT NULL,
+                    Email  VARCHAR(50) NOT NULL,
+                    Boss VARCHAR(12) NOT NULL,
+                    promedio REAL
+                );
+            """)
+    conn.commit()
+    return conn
+
+
 class CEA(TM):
-    def __init__(self, racfid, email, boss, evaluator, qa, team):
+    def __init__(self, racfid, email, boss, evaluator, qa, team, Position):
         super().__init__(racfid, email, boss, evaluator, qa)
         self.Team = team
+
+
+def _conn():
+    conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row
+    conn.execute("""
+                CREATE TABLE IF NOT EXISTS Staff(
+                    RACFID VARCHAR(12) PRIMARY KEY,
+                    nombre VARCHAR(50) NOT NULL,
+                    Email  VARCHAR(50) NOT NULL,
+                    Boss VARCHAR(12) NOT NULL,
+        Position VARCHAR(12) NOT NULL,
+                    promedio REAL
+                );
+            """)
+    conn.commit()
+    return conn
 
 
 class BIG_BOSS(TM):
@@ -63,26 +97,56 @@ class BIG_BOSS(TM):
         self.Team = team
 
 
-class Add:
-    def AddTM(self, team, tm):
-        team.append(tm)
+def _conn():
+    conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row
+    conn.execute("""
+                CREATE TABLE IF NOT EXISTS BIGBOSS(
+                    RACFID VARCHAR(12) PRIMARY KEY,
+                    nombre VARCHAR(50) NOT NULL,
+                    Email  VARCHAR(50) NOT NULL,
+                    Boss VARCHAR(12) NOT NULL,
+                    promedio REAL
+                );
+            """)
+    conn.commit()
+    return conn
 
-    def AddStaff(self, team, staff):
+
+class Add:
+    def AddTM(self, racfid, email, boss, evaluator, qa, name):
+        with self._conn() as conn:
+
+    conn.execute(
+        "INSERT INTO TMs(self, racfid, email, boss, qa,name,position) VALUES (?, ?, ?)",
+        (self, racfid, email, boss, qa, name, position)
+    )
+
+    def AddStaff(self, racfid, email, boss, qa, name, position):
         team.append(staff)
+        with self._conn() as conn:
+
+    conn.execute(
+        "INSERT INTO Staff(self, racfid, email, boss, qa,name,position) VALUES (?, ?, ?)",
+        (self, racfid, email, boss, qa, name, position)
+    )
 
 
 class Erase:
-    def EraseTM(self, team, tm):
-        if tm in team:
-            team.remove(tm)
+    ide = input("Ingrese racifdel estudiante a eliminar: ")
+    with Estudiante._conn() as conn:
+        cur = conn.execute("DELETE FROM estudiantes WHERE id_estudiante = ?", (ide,))
+        if cur.rowcount == 0:
+            print("No se encontró el estudiante.")
         else:
-            print("TM not found in team.")
+            print("Estudiante eliminado con éxito.")
 
-    def EraseStaff(self, team, staff):
-        if staff in team:
-            team.remove(staff)
-        else:
-            print("Staff not found in team.")
+
+def EraseStaff(self, team, staff):
+    if staff in team:
+        team.remove(staff)
+    else:
+        print("Staff not found in team.")
 
 
 class Modify:
@@ -91,16 +155,14 @@ class Modify:
             if LIST(tm, key):
                 LIST(tm, key, value)
 
-
     def ModifyStaff(self, staff, LIST):
         for key, value in LIST.items():
             if LIST(staff, key):
                 LIST(staff, key, value)
 
 
-
 class Evaluations:
-    def __init__(self, solutioning, policies, documentation, satisfaction,callid,addfeedback,total):
+    def __init__(self, solutioning, policies, documentation, satisfaction, callid, addfeedback, total):
         self.solutioning = solutioning
         self.policies = policies
         self.documentation = documentation
@@ -127,22 +189,21 @@ class Evaluations:
             conn.commit()
             return conn
 
-    def Evaluate(self, solutioning, policies, documentation, satisfaction,racfid,callid,addfeedback):
+    def Evaluate(self, solutioning, policies, documentation, satisfaction, racfid, callid, addfeedback):
         self.total = solutioning + policies + documentation + satisfaction
         self.addfeedback = addfeedback
 
         with self._conn() as conn:
             conn.execute(
                 "INSERT INTO Evaluations (TM_evaluated,solutioning,policies,documentation,satisfaction,callid,addfeedback,total) VALUES (?, ?, ?,?,?,?,?,?)",
-                (self.racfid, self.solutioning, self.policies, self.documentation, self.satisfaction, self.callid, self.addfeedback, self.total)
-                )
+                (self.racfid, self.solutioning, self.policies, self.documentation, self.satisfaction, self.callid,
+                 self.addfeedback, self.total)
+            )
             print(f"Evaluacion guardada: {self.callid}")
-
 
 
 class LoginApp:
     def __init__(self):
-
         self.COLOR_FONDO = "mint cream"
         self.COLOR_TEXTO = "medium orchid"
         self.COLOR_ESCRIBIR = "lime green"
@@ -151,7 +212,6 @@ class LoginApp:
         self.FONT_TITULO = ("Goudy Old Style", 32, "bold")
         self.FONT_SUBTITULO = ("Goudy Old Style", 18, "bold")
         self.FONT_TEXTO = ("Stencil Std", 11, "bold")
-
 
         self.ventana = tk.Tk()
         self.ventana.title("Login - QA checkup system")
@@ -183,12 +243,12 @@ class LoginApp:
         frame = tk.Frame(self.ventana, bg=self.COLOR_FONDO)
         frame.pack(pady=20)
 
-        tk.Label(frame, text="RACFID:", font=self.FONT_SUBTITULO, bg=self.COLOR_FONDO, fg=self.COLOR_ESCRIBIR)\
+        tk.Label(frame, text="RACFID:", font=self.FONT_SUBTITULO, bg=self.COLOR_FONDO, fg=self.COLOR_ESCRIBIR) \
             .grid(row=0, column=0, padx=10, pady=10, sticky="e")
         self.entry_usuario = tk.Entry(frame, width=30, font=("Arial", 14))
         self.entry_usuario.grid(row=0, column=1, padx=10, pady=10)
 
-        tk.Label(frame, text="Contraseña:", font=self.FONT_SUBTITULO, bg=self.COLOR_FONDO, fg=self.COLOR_ESCRIBIR)\
+        tk.Label(frame, text="Contraseña:", font=self.FONT_SUBTITULO, bg=self.COLOR_FONDO, fg=self.COLOR_ESCRIBIR) \
             .grid(row=1, column=0, padx=10, pady=10, sticky="e")
         self.entry_contrasena = tk.Entry(frame, width=30, show="*", font=("Arial", 14))
         self.entry_contrasena.grid(row=1, column=1, padx=10, pady=10)
@@ -210,7 +270,6 @@ class LoginApp:
 
 class WelcomeScreen:
     def __init__(self, usuario):
-
         self.COLOR_FONDO = "mint cream"
         self.COLOR_TEXTO = "medium orchid"
         self.COLOR_TITULO = "dark violet"
@@ -218,12 +277,10 @@ class WelcomeScreen:
         self.FONT_TITULO = ("Goudy Old Style", 32, "bold")
         self.FONT_SUBTITULO = ("Goudy Old Style", 18, "bold")
 
-
         self.ventana = tk.Tk()
         self.ventana.title("Bienvenido - QA checkup system")
         self.ventana.geometry("600x400")
         self.ventana.config(bg=self.COLOR_FONDO)
-
 
         self.crear_barra_superior()
 
@@ -259,7 +316,6 @@ class WelcomeScreen:
     def crear_barra_superior(self):
         barra = tk.Frame(self.ventana, bg=self.COLOR_BOTON, height=40)
         barra.pack(fill="x", side="top")
-
 
         tk.Button(
             barra,
@@ -343,3 +399,4 @@ class WelcomeScreen:
 
 if __name__ == "__main__":
     LoginApp()
+
