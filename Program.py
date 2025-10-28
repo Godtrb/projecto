@@ -47,9 +47,8 @@ class TM:
 
 
 class Sups(TM):
-    def __init__(self, racfid, email, boss, evaluator, qa, team):
-        super().__init__(racfid, email, boss, evaluator, qa)
-        self.Team = team
+    def __init__(self, racfid, email, boss, evaluator, qa, position):
+        super().__init__(racfid, email, boss, evaluator, qa, position)
 
 
 def _conn():
@@ -61,6 +60,7 @@ def _conn():
                     nombre VARCHAR(50) NOT NULL,
                     Email  VARCHAR(50) NOT NULL,
                     Boss VARCHAR(12) NOT NULL,
+	        Position VARCHAR 
                     promedio REAL
                 );
             """)
@@ -133,32 +133,17 @@ class Add:
 
 
 class Erase:
-    ide = input("Ingrese racifdel estudiante a eliminar: ")
-    with Estudiante._conn() as conn:
-        cur = conn.execute("DELETE FROM estudiantes WHERE id_estudiante = ?", (ide,))
-        if cur.rowcount == 0:
-            print("No se encontró el estudiante.")
-        else:
-            print("Estudiante eliminado con éxito.")
+    ide = input("Ingrese racif del trabajador a eliminar: ")
+    with Erase._conn() as conn:
+        cur = conn.execute("DELETE FROM TMs WHERE RACFID= ?", (ide,))
 
 
 def EraseStaff(self, team, staff):
-    if staff in team:
-        team.remove(staff)
-    else:
-        print("Staff not found in team.")
+    ide = input("Ingrese racif del trabajador a eliminar: ")
 
 
-class Modify:
-    def ModifyTM(self, tm, LIST):
-        for key, value in LIST.items():
-            if LIST(tm, key):
-                LIST(tm, key, value)
-
-    def ModifyStaff(self, staff, LIST):
-        for key, value in LIST.items():
-            if LIST(staff, key):
-                LIST(staff, key, value)
+with Erase._conn() as conn:
+    cur = conn.execute("DELETE FROM Staff WHERE RACFID= ?", (ide,))
 
 
 class Evaluations:
