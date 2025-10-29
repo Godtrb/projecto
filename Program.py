@@ -1,12 +1,78 @@
 import tkinter as tk
 
+class Evaluations:
+    def __init__(self, solutioning, policies, documentation, satisfaction, callid, addfeedback, total):
+        self.solutioning = solutioning
+        self.policies = policies
+        self.documentation = documentation
+        self.satisfaction = satisfaction
+        self.callid = callid
+        self.addfeedback = addfeedback
+        self.total = total
+
+        def _conn():
+            conn = sqlite3.connect(DB_NAME)
+            conn.row_factory = sqlite3.Row
+            conn.execute("""
+                   CREATE TABLE IF NOT EXISTS Evaluations (
+                       TM_evaluated VARCHAR(12) NOT NULL,
+                       solutioing INT CHECK (solutioing <=25),
+                       policies INT CHECK (solutioing <=25),
+                       documentation INT CHECK (solutioing <=25),
+                       satisfaction INT CHECK (solutioing <=25),
+                       callid varchar(20) NOT NULL,
+                       addfeedback varchar(200) NOT NULL,
+                       total REAL
+                   );
+               """)
+            conn.commit()
+            return conn
+
+    def Evaluate(self, solutioning, policies, documentation, satisfaction, racfid, callid, addfeedback):
+        self.total = solutioning + policies + documentation + satisfaction
+        self.addfeedback = addfeedback
+
+        with self._conn() as conn:
+            conn.execute(
+                "INSERT INTO Evaluations (TM_evaluated,solutioning,policies,documentation,satisfaction,callid,addfeedback,total) VALUES (?, ?, ?,?,?,?,?,?)",
+                (self.racfid, self.solutioning, self.policies, self.documentation, self.satisfaction, self.callid,
+                 self.addfeedback, self.total)
+            )
+            print(f"Evaluacion guardada: {self.callid}")
+
 
 class QA:
-    def __init__(self, avg, evalsdone):
+    def __init__(self,TM_evaluated, avg, evalsdone,eval1,eval2,eval3,eval4,eval5,eval6,eval7,eval8,totval):
         self.Evalsdone = evalsdone
         self.AVG = avg
 
+        def _conn():
+            conn = sqlite3.connect(DB_NAME)
+            conn.row_factory = sqlite3.Row
+            conn.execute("""
+                        CREATE TABLE IF NOT EXISTS Evaluations (
+                            TM_evaluated VARCHAR(12) NOT NULL,
+                            avg REAL CHECK (solutioing <=110),
+                            eval1 varchar(200) NOT NULL,
+                            eval2 varchar(200) NOT NULL,
+                            eval3 varchar(200) NOT NULL,
+                            eval4 varchar(200) NOT NULL,
+                            eval5 varchar(200) NOT NULL,
+                            eval6 varchar(200) NOT NULL,
+                            eval7 varchar(200) NOT NULL,
+                            eval8 varchar(200) NOT NULL,
+                            evalsdone INT DEFAULT 0,
+                            totval REAL 
+                        );
+                    """)
+            conn.commit()
+            return conn
+
     def CalcAvg(self):
+        with QA._conn() as conn:
+            cur = conn.execute("
+            prom = cur.fetchone()["prom"]
+
         return self.AVG
 
     def CalcTotscore(self):
@@ -14,13 +80,11 @@ class QA:
 
 
 class TM:
-    def __init__(self, racfid, email, boss, evaluator, qa, name):
+    def __init__(self, racfid, boss, evaluator, name):
         self.name = name
         self.RACFID = racfid
-        self.Email = email
         self.Boss = boss
         self.Evaluator = evaluator
-        self.QA = qa
 
         def _conn():
             conn = sqlite3.connect(DB_NAME)
@@ -29,7 +93,6 @@ class TM:
                 CREATE TABLE IF NOT EXISTS TMs (
                     RACFID VARCHAR(12) PRIMARY KEY,
                     nombre VARCHAR(50) NOT NULL,
-                    Email  VARCHAR(50) NOT NULL,
                     Boss VARCHAR(12) NOT NULL,
 
                     promedio REAL
@@ -47,8 +110,8 @@ class TM:
 
 
 class Sups(TM):
-    def __init__(self, racfid, email, boss, evaluator, qa, position):
-        super().__init__(racfid, email, boss, evaluator, qa, position)
+    def __init__(self, racfid, email, boss, evaluator, position):
+        super().__init__(racfid, email, boss, evaluator, position)
 
 
 def _conn():
@@ -69,8 +132,8 @@ def _conn():
 
 
 class CEA(TM):
-    def __init__(self, racfid, email, boss, evaluator, qa, team, Position):
-        super().__init__(racfid, email, boss, evaluator, qa)
+    def __init__(self, racfid, email, boss, evaluator, team, Position):
+        super().__init__(racfid, email, boss, evaluator)
         self.Team = team
 
 
@@ -114,28 +177,27 @@ def _conn():
 
 
 class Add:
-    def AddTM(self, racfid, email, boss, evaluator, qa, name):
+    def AddTM(self, racfid, boss, evaluator, qa, name):
         with self._conn() as conn:
 
-    conn.execute(
-        "INSERT INTO TMs(self, racfid, email, boss, qa,name,position) VALUES (?, ?, ?)",
-        (self, racfid, email, boss, qa, name, position)
-    )
+            conn.execute(
+            "INSERT INTO TMs (self, racfid, boss,name,position) VALUES ( ?,?,?,?)",
+            (self, racfid , boss, name, position)
+            )
 
-    def AddStaff(self, racfid, email, boss, qa, name, position):
-        team.append(staff)
-        with self._conn() as conn:
+    def AddStaff(self, racfid, , boss, name, position):
+         with self._conn() as conn:
 
-    conn.execute(
-        "INSERT INTO Staff(self, racfid, email, boss, qa,name,position) VALUES (?, ?, ?)",
-        (self, racfid, email, boss, qa, name, position)
-    )
+            conn.execute(
+                    "INSERT INTO Staff(self, racfid, boss,name,position) VALUES ( ?,?,?,?,?)",
+                    (self, racfid , boss, name, position)
+                )
 
 
 class Erase:
     ide = input("Ingrese racif del trabajador a eliminar: ")
     with Erase._conn() as conn:
-        cur = conn.execute("DELETE FROM TMs WHERE RACFID= ?", (ide,))
+        cur = conn.execute("DELETE FROM TMs WHERE RACFID= ?", (ide))
 
 
 def EraseStaff(self, team, staff):
@@ -146,45 +208,6 @@ with Erase._conn() as conn:
     cur = conn.execute("DELETE FROM Staff WHERE RACFID= ?", (ide,))
 
 
-class Evaluations:
-    def __init__(self, solutioning, policies, documentation, satisfaction, callid, addfeedback, total):
-        self.solutioning = solutioning
-        self.policies = policies
-        self.documentation = documentation
-        self.satisfaction = satisfaction
-        self.callid = callid
-        self.addfeedback = addfeedback
-        self.total = total
-
-        def _conn():
-            conn = sqlite3.connect(DB_NAME)
-            conn.row_factory = sqlite3.Row
-            conn.execute("""
-                   CREATE TABLE IF NOT EXISTS Evaluations (
-                       TM_evaluated VARCHAR(12) NOT NULL,
-                       solutioing INT CHECK (solutioing <=25),
-                       policies INT CHECK (solutioing <=25),
-                       documentation INT CHECK (solutioing <=25),
-                       satisfaction INT CHECK (solutioing <=25),
-                       callid varchar(20) NOT NULL,
-                       addfeedback varchar(200) NOT NULL,
-                       total REAL
-                   );
-               """)
-            conn.commit()
-            return conn
-
-    def Evaluate(self, solutioning, policies, documentation, satisfaction, racfid, callid, addfeedback):
-        self.total = solutioning + policies + documentation + satisfaction
-        self.addfeedback = addfeedback
-
-        with self._conn() as conn:
-            conn.execute(
-                "INSERT INTO Evaluations (TM_evaluated,solutioning,policies,documentation,satisfaction,callid,addfeedback,total) VALUES (?, ?, ?,?,?,?,?,?)",
-                (self.racfid, self.solutioning, self.policies, self.documentation, self.satisfaction, self.callid,
-                 self.addfeedback, self.total)
-            )
-            print(f"Evaluacion guardada: {self.callid}")
 
 
 class LoginApp:
