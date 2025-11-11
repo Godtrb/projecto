@@ -2,32 +2,13 @@ import tkinter as tk
 from tkinter import messagebox, simpledialog
 import mysql.connector
 
-# -----------------------
-# CONFIGURACIÓN MySQL
-# -----------------------
+
 DB_CONFIG = {
     'host': 'localhost',
     'user': 'root',
-    'password': '12345',  # Cambia por tu contraseña real
+    'password': '12345',  
     'database': 'qa_system'
 }
-mysql -u root -p
-Ingresa tu contraseña (12345 en tu caso).
-
-Crea la base de datos:
-
-sql
-Copy code
-CREATE DATABASE qa_system;
-Opcional: selecciona la base de datos y verifica que exista:
-
-sql
-Copy code
-USE qa_system;
-SHOW TABLES;
-# -----------------------
-# CLASE DE EVALUACIONES
-# -----------------------
 class Evaluations:
     def __init__(self):
         self.total = 0
@@ -72,9 +53,6 @@ class Evaluations:
             conn.commit()
             cur.close()
 
-# -----------------------
-# LOGIN PRINCIPAL
-# -----------------------
 class LoginApp:
     def __init__(self):
         self.COLOR_FONDO = "mint cream"
@@ -118,7 +96,6 @@ class LoginApp:
                 );
             """)
 
-            # Usuarios por defecto
             cur.execute(
                 "INSERT IGNORE INTO Staff (RACFID, nombre, Boss, Position, password, promedio) VALUES "
                 "(%s,%s,%s,%s,%s,%s)",
@@ -191,9 +168,6 @@ class LoginApp:
         except mysql.connector.Error as e:
             messagebox.showerror("Error DB", str(e))
 
-# -----------------------
-# PANTALLA PRINCIPAL
-# -----------------------
 class WelcomeScreen:
     def __init__(self, nombre, boss, position, tipo, racfid):
         self.nombre = nombre
@@ -232,8 +206,6 @@ class WelcomeScreen:
                 tk.Button(barra, text="Realizar Evaluación", bg="white", command=self.realizar_evaluacion).pack(side="left", padx=5)
         elif self.tipo == "TM":
             tk.Button(barra, text="Mis Evaluaciones", bg="white", command=self.ver_evaluaciones).pack(side="left", padx=5)
-
-    # -------------------- BIG BOSS --------------------
     def manejo_personal_bigboss(self):
         win = tk.Toplevel(self.root)
         win.title("Manejo de Personal - Big Boss")
@@ -306,7 +278,6 @@ class WelcomeScreen:
         tk.Button(win, text="Guardar", bg="pale green", command=guardar).pack(pady=10)
         tk.Button(win, text="Eliminar Usuario", bg="light coral", command=eliminar).pack(pady=10)
 
-    # -------------------- CEA / TL --------------------
     def manejo_tms_cea_tl(self):
         win = tk.Toplevel(self.root)
         win.title("Manejo de TMs (CEA/TL)")
@@ -374,7 +345,7 @@ class WelcomeScreen:
         tk.Button(win, text="Guardar TM", bg="pale green", command=guardar).pack(pady=10)
         tk.Button(win, text="Eliminar TM", bg="light coral", command=eliminar).pack(pady=10)
 
-    # -------------------- EVALUAR --------------------
+
     def realizar_evaluacion(self):
         win = tk.Toplevel(self.root)
         win.title("Realizar Evaluación")
@@ -444,8 +415,6 @@ class WelcomeScreen:
         except mysql.connector.Error as e:
             messagebox.showerror("Error DB", str(e))
 
-# -----------------------
-# EJECUCIÓN PRINCIPAL
-# -----------------------
+
 if __name__ == "__main__":
     LoginApp()
