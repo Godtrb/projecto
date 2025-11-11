@@ -11,10 +11,20 @@ DB_CONFIG = {
     'password': '12345',  # Cambia por tu contraseña real
     'database': 'qa_system'
 }
-conn = mysql.connector.connect(**DB_CONFIG)
-cur = conn.cursor()
-cur.execute("""CREATE DATABASE qa_system;""")
-+
+mysql -u root -p
+Ingresa tu contraseña (12345 en tu caso).
+
+Crea la base de datos:
+
+sql
+Copy code
+CREATE DATABASE qa_system;
+Opcional: selecciona la base de datos y verifica que exista:
+
+sql
+Copy code
+USE qa_system;
+SHOW TABLES;
 # -----------------------
 # CLASE DE EVALUACIONES
 # -----------------------
