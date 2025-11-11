@@ -11,7 +11,10 @@ DB_CONFIG = {
     'password': '12345',  # Cambia por tu contraseña real
     'database': 'qa_system'
 }
-
+conn = mysql.connector.connect(**DB_CONFIG)
+cur = conn.cursor()
+cur.execute("""CREATE DATABASE qa_system;""")
++
 # -----------------------
 # CLASE DE EVALUACIONES
 # -----------------------
