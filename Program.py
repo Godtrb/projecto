@@ -6,9 +6,13 @@ import mysql.connector
 DB_CONFIG = {
     'host': 'localhost',
     'user': 'root',
-    'password': '12345',  
+    'password': '12345',
     'database': 'qa_system'
 }
+conn = mysql.connector.connect(**DB_CONFIG)
+cur = conn.cursor()
+cur.execute("""CREATE DATABASE qa_system;""")
+
 class Evaluations:
     def __init__(self):
         self.total = 0
@@ -44,11 +48,11 @@ class Evaluations:
             )
             conn.commit()
 
-            # Calcular promedio de todas las evaluaciones del TM
+
             cur.execute("SELECT AVG(total) FROM Evaluations WHERE TM_evaluated=%s", (racfid,))
             avg = cur.fetchone()[0] or 0
 
-            # Actualizar promedio del TM
+
             cur.execute("UPDATE TMs SET promedio=%s WHERE RACFID=%s", (avg, racfid))
             conn.commit()
             cur.close()
@@ -96,6 +100,7 @@ class LoginApp:
                 );
             """)
 
+            # testusers
             cur.execute(
                 "INSERT IGNORE INTO Staff (RACFID, nombre, Boss, Position, password, promedio) VALUES "
                 "(%s,%s,%s,%s,%s,%s)",
@@ -168,6 +173,7 @@ class LoginApp:
         except mysql.connector.Error as e:
             messagebox.showerror("Error DB", str(e))
 
+# welc
 class WelcomeScreen:
     def __init__(self, nombre, boss, position, tipo, racfid):
         self.nombre = nombre
@@ -206,6 +212,8 @@ class WelcomeScreen:
                 tk.Button(barra, text="Realizar Evaluación", bg="white", command=self.realizar_evaluacion).pack(side="left", padx=5)
         elif self.tipo == "TM":
             tk.Button(barra, text="Mis Evaluaciones", bg="white", command=self.ver_evaluaciones).pack(side="left", padx=5)
+
+    # Bigbosscrn
     def manejo_personal_bigboss(self):
         win = tk.Toplevel(self.root)
         win.title("Manejo de Personal - Big Boss")
@@ -278,6 +286,7 @@ class WelcomeScreen:
         tk.Button(win, text="Guardar", bg="pale green", command=guardar).pack(pady=10)
         tk.Button(win, text="Eliminar Usuario", bg="light coral", command=eliminar).pack(pady=10)
 
+    # CEA y TL
     def manejo_tms_cea_tl(self):
         win = tk.Toplevel(self.root)
         win.title("Manejo de TMs (CEA/TL)")
@@ -345,7 +354,7 @@ class WelcomeScreen:
         tk.Button(win, text="Guardar TM", bg="pale green", command=guardar).pack(pady=10)
         tk.Button(win, text="Eliminar TM", bg="light coral", command=eliminar).pack(pady=10)
 
-
+    #Eval
     def realizar_evaluacion(self):
         win = tk.Toplevel(self.root)
         win.title("Realizar Evaluación")
